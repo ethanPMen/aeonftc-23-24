@@ -83,7 +83,7 @@ public class ARCTO extends LinearOpMode {
             prevRightBumper = gamepad1.right_bumper;
             // trapdoor toggle
             boolean leftBumperPressed = !prevLeftBumper && gamepad1.left_bumper;
-            prevLeftBumper = gamepad1.right_bumper;
+            prevLeftBumper = gamepad1.left_bumper;
 
             //operator buttons
             boolean opY = gamepad2.y;
@@ -122,11 +122,10 @@ public class ARCTO extends LinearOpMode {
                 } else {
                     trapdoorBoom = true;
                 }
-            }
             if (trapdoorBoom) {
-                trapdoorServo.setPosition(1);
-            } else {
                 trapdoorServo.setPosition(0);
+            } else {
+                trapdoorServo.setPosition(1);
             }
 
             //elevator code
@@ -179,10 +178,18 @@ public class ARCTO extends LinearOpMode {
             }
             //end of drone code
 
-            leftFront.setPower(frontLeftPower);
-            leftRear.setPower(backLeftPower);
-            rightFront.setPower(frontRightPower);
-            rightRear.setPower(backRightPower);
+            if (getElevatorPosition() > 1100) {
+                leftFront.setPower(frontLeftPower*0.25);
+                leftRear.setPower(backLeftPower*0.25);
+                rightFront.setPower(frontRightPower*0.25);
+                rightRear.setPower(backRightPower*0.25);
+            }
+            else {
+                leftFront.setPower(frontLeftPower);
+                leftRear.setPower(backLeftPower);
+                rightFront.setPower(frontRightPower);
+                rightRear.setPower(backRightPower);
+            }
 
             telemetry.addData("Drone Servo position", droneServo.getPosition());
             telemetry.addData("Elevator Setpoint", setpoint);
@@ -192,6 +199,8 @@ public class ARCTO extends LinearOpMode {
             telemetry.addData("Error", error);
             telemetry.addData("Elevator Power", elevatorPower);
             telemetry.addData("kP", kP);
+            telemetry.addData("trapdoor position", trapdoorServo.getPosition());
+            telemetry.addData("trapdoor pressed", trapdoorBoom);
             telemetry.update();
         }
     }
