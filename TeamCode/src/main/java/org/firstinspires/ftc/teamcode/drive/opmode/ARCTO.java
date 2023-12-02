@@ -47,10 +47,12 @@ public class ARCTO extends LinearOpMode {
         elevatorMotor = hardwareMap.dcMotor.get("elevatorMotor");
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
         Servo droneServo = hardwareMap.servo.get("droneServo");
+        Servo trapdoorServo = hardwareMap.servo.get("trapdoorServo");
         final double kP = 1.0 / 4.0;
         final double kD = 0;
         final double kI = 0;
         boolean intakeOn = false;
+        boolean trapdoorBoom = false;
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
@@ -64,6 +66,7 @@ public class ARCTO extends LinearOpMode {
         double setpoint = 0;
         double lastError = 0;
         boolean prevRightBumper = gamepad1.right_bumper;
+        boolean prevLeftBumper = gamepad1.left_bumper;
 
         while (opModeIsActive()) {
             //resetEncoders();
@@ -75,7 +78,12 @@ public class ARCTO extends LinearOpMode {
             boolean buttonB = gamepad1.b;
             boolean buttonA = gamepad1.a;
             boolean buttonX = gamepad1.x;
-            boolean leftBumper = gamepad1.left_bumper;
+            // for intake toggle
+            boolean rightBumperPressed = !prevRightBumper && gamepad1.right_bumper;
+            prevRightBumper = gamepad1.right_bumper;
+            // trapdoor toggle
+            boolean leftBumperPressed = !prevLeftBumper && gamepad1.left_bumper;
+            prevLeftBumper = gamepad1.right_bumper;
 
             //operator buttons
             boolean opY = gamepad2.y;
@@ -95,8 +103,6 @@ public class ARCTO extends LinearOpMode {
             double backRightPower = (y + x - rx) / denominator;
 
             //intake command
-            boolean rightBumperPressed = !prevRightBumper && gamepad1.right_bumper;
-            prevRightBumper = gamepad1.right_bumper;
             if (rightBumperPressed) {
                 if (intakeOn) {
                     intakeOn = false;
@@ -104,11 +110,23 @@ public class ARCTO extends LinearOpMode {
                     intakeOn = true;
                 }
             }
-
             if (intakeOn) {
                 intakeMotor.setPower(1);
             } else {
                 intakeMotor.setPower(0);
+            }
+            //trapdoor
+            if (leftBumperPressed) {
+                if (trapdoorBoom) {
+                    trapdoorBoom = false;
+                } else {
+                    trapdoorBoom = true;
+                }
+            }
+            if (trapdoorBoom) {
+                trapdoorServo.setPosition(1);
+            } else {
+                trapdoorServo.setPosition(0);
             }
 
             //elevator code
@@ -155,7 +173,7 @@ public class ARCTO extends LinearOpMode {
 
 
             //drone code
-            if (leftBumper) {
+            if (opLB) {
                 droneServo.setDirection(Servo.Direction.REVERSE);
                 droneServo.setPosition(0); //to release
             }
