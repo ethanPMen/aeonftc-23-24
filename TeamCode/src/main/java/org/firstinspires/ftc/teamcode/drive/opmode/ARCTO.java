@@ -11,6 +11,7 @@ public class ARCTO extends LinearOpMode {
     class SlewRateLimiter {
         private double slewRateMax;
         private double lastSetpoint = 0;
+
         SlewRateLimiter(double slewRateMax) {
             this.slewRateMax = slewRateMax;
         }
@@ -23,6 +24,7 @@ public class ARCTO extends LinearOpMode {
             return setpoint;
         }
     }
+
     final double kElevatorPower = .7;
     double kElevatorOffset = 0;
     final double kElevatorScale = 1.0 / 100.0;
@@ -34,6 +36,7 @@ public class ARCTO extends LinearOpMode {
     private void reZero() {
         kElevatorOffset = elevatorMotor.getCurrentPosition();
     }
+
     DcMotor elevatorMotor;
 
     @Override
@@ -115,6 +118,11 @@ public class ARCTO extends LinearOpMode {
             } else {
                 intakeMotor.setPower(0);
             }
+
+            if (opRB) {
+                intakeMotor.setPower(-1);
+            }
+
             //trapdoor
             if (leftBumperPressed) {
                 if (trapdoorBoom) {
@@ -122,86 +130,91 @@ public class ARCTO extends LinearOpMode {
                 } else {
                     trapdoorBoom = true;
                 }
-            if (trapdoorBoom) {
-                trapdoorServo.setPosition(0);
-            } else {
-                trapdoorServo.setPosition(1);
+                if (trapdoorBoom) {
+                    trapdoorServo.setPosition(0);
+                } else {
+                    trapdoorServo.setPosition(1);
+                }
             }
 
-            //elevator code
-            setpoint = elevatorMotor.getTargetPosition() * kElevatorScale;
-            double elevatorPosition = getElevatorPosition();
+                //elevator code
+                setpoint = elevatorMotor.getTargetPosition() * kElevatorScale;
+                double elevatorPosition = getElevatorPosition();
 
-            double error = setpoint - elevatorPosition;
-            double changeInError = error - lastError;
-            double elevatorPower = kP * error + kD * changeInError;
-            lastError = error;
+                double error = setpoint - elevatorPosition;
+                double changeInError = error - lastError;
+                double elevatorPower = kP * error + kD * changeInError;
+                lastError = error;
 
-            //elevator
+                // TRAPDOOR AUTO CLOSE
+                if (elevatorPosition < 11.0) {
+                    trapdoorServo.setPosition(1);
+                }
 
-            if (opA) {
-                reZero(); //sets whatever position it's at to zero
-            }
-            if (buttonA && (elevatorPosition > 0)) { //stow
-                elevatorMotor.setTargetPosition(0);
-            }
-            if (buttonX) {
-                elevatorMotor.setTargetPosition((int)(12.0 / kElevatorScale)); // low
-            }
-            if (buttonB) {
-                elevatorMotor.setTargetPosition((int)(27.0 / kElevatorScale)); // mid
-            }
-            if (buttonY && elevatorPosition < 3900 * kElevatorScale) { //high
-                elevatorMotor.setTargetPosition((int)(39.0 / kElevatorScale));
-            }
-            elevatorMotor.setPower(elevatorPower);
+                //elevator
 
-            //manual movement
-            if (opX) {
-                elevatorMotor.setPower(.5); //up
-                elevatorMotor.setTargetPosition(elevatorMotor.getCurrentPosition());
-            }
-            if (opB) {
-                elevatorMotor.setPower(-.5);
-                elevatorMotor.setTargetPosition(elevatorMotor.getCurrentPosition());//down
-            }
-            if (opY) {
-                elevatorPower = 0;
-                elevatorMotor.setTargetPosition(elevatorMotor.getCurrentPosition()); //stop
-            }
+                if (opA) {
+                    reZero(); //sets whatever position it's at to zero
+                }
+                if (buttonA && (elevatorPosition > 0)) { //stow
+                    elevatorMotor.setTargetPosition(0);
+                }
+                if (buttonX) {
+                    elevatorMotor.setTargetPosition((int) (12.0 / kElevatorScale)); // low
+                }
+                if (buttonB) {
+                    elevatorMotor.setTargetPosition((int) (27.0 / kElevatorScale)); // mid
+                }
+                if (buttonY && elevatorPosition < 3900 * kElevatorScale) { //high
+                    elevatorMotor.setTargetPosition((int) (39.0 / kElevatorScale));
+                }
+                elevatorMotor.setPower(elevatorPower);
+
+                //manual movement
+                if (opX) {
+                    elevatorMotor.setPower(.5); //up
+                    elevatorMotor.setTargetPosition(elevatorMotor.getCurrentPosition());
+                }
+                if (opB) {
+                    elevatorMotor.setPower(-.5);
+                    elevatorMotor.setTargetPosition(elevatorMotor.getCurrentPosition());//down
+                }
+                if (opY) {
+                    elevatorPower = 0;
+                    elevatorMotor.setTargetPosition(elevatorMotor.getCurrentPosition()); //stop
+                }
 
 
-            //drone code
-            if (opLB) {
-                droneServo.setDirection(Servo.Direction.REVERSE);
-                droneServo.setPosition(0); //to release
-            }
-            //end of drone code
+                //drone code
+                if (opLB) {
+                    droneServo.setDirection(Servo.Direction.REVERSE);
+                    droneServo.setPosition(0); //to release
+                }
+                //end of drone code
 
-            if (getElevatorPosition() > 1100) {
-                leftFront.setPower(frontLeftPower*0.25);
-                leftRear.setPower(backLeftPower*0.25);
-                rightFront.setPower(frontRightPower*0.25);
-                rightRear.setPower(backRightPower*0.25);
-            }
-            else {
-                leftFront.setPower(frontLeftPower);
-                leftRear.setPower(backLeftPower);
-                rightFront.setPower(frontRightPower);
-                rightRear.setPower(backRightPower);
-            }
+                if (elevatorPosition < 11.0) {
+                    leftFront.setPower(frontLeftPower);
+                    leftRear.setPower(backLeftPower);
+                    rightFront.setPower(frontRightPower);
+                    rightRear.setPower(backRightPower);
+                } else {
+                    leftFront.setPower(frontLeftPower / 2);
+                    leftRear.setPower(backLeftPower / 2);
+                    rightFront.setPower(frontRightPower / 2);
+                    rightRear.setPower(backRightPower / 2);
+                }
 
-            telemetry.addData("Drone Servo position", droneServo.getPosition());
-            telemetry.addData("Elevator Setpoint", setpoint);
-            telemetry.addData("Elevator Raw Position", elevatorMotor.getCurrentPosition());
-            telemetry.addData("Elevator Position", getElevatorPosition());
-            telemetry.addData("Elevator Target Position", elevatorMotor.getTargetPosition());
-            telemetry.addData("Error", error);
-            telemetry.addData("Elevator Power", elevatorPower);
-            telemetry.addData("kP", kP);
-            telemetry.addData("trapdoor position", trapdoorServo.getPosition());
-            telemetry.addData("trapdoor pressed", trapdoorBoom);
-            telemetry.update();
+                telemetry.addData("Drone Servo position", droneServo.getPosition());
+                telemetry.addData("Elevator Setpoint", setpoint);
+                telemetry.addData("Elevator Raw Position", elevatorMotor.getCurrentPosition());
+                telemetry.addData("Elevator Position", getElevatorPosition());
+                telemetry.addData("Elevator Target Position", elevatorMotor.getTargetPosition());
+                telemetry.addData("Error", error);
+                telemetry.addData("Elevator Power", elevatorPower);
+                telemetry.addData("kP", kP);
+                telemetry.addData("trapdoor position", trapdoorServo.getPosition());
+                telemetry.addData("trapdoor pressed", trapdoorBoom);
+                telemetry.update();
+            }
         }
     }
-}
