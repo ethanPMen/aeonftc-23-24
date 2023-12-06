@@ -147,7 +147,7 @@ public class ARCTO extends LinearOpMode {
                 lastError = error;
 
                 // TRAPDOOR AUTO CLOSE
-                if (elevatorPosition < 11.0) {
+                if (elevatorPosition < 14.0) {
                     trapdoorServo.setPosition(1);
                 }
 
@@ -160,7 +160,7 @@ public class ARCTO extends LinearOpMode {
                     elevatorMotor.setTargetPosition(0);
                 }
                 if (buttonX) {
-                    elevatorMotor.setTargetPosition((int) (12.0 / kElevatorScale)); // low
+                    elevatorMotor.setTargetPosition((int) (14.0 / kElevatorScale)); // low
                 }
                 if (buttonB) {
                     elevatorMotor.setTargetPosition((int) (27.0 / kElevatorScale)); // mid
@@ -192,7 +192,7 @@ public class ARCTO extends LinearOpMode {
                 }
                 //end of drone code
 
-                if (elevatorPosition < 11.0) {
+                if (elevatorPosition < 14.0) {
                     leftFront.setPower(frontLeftPower);
                     leftRear.setPower(backLeftPower);
                     rightFront.setPower(frontRightPower);
