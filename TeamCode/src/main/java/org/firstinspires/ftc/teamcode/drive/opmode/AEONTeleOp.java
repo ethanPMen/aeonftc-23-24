@@ -9,7 +9,6 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.drive.opmode.ARCTO;
 
 @TeleOp
 public class AEONTeleOp extends LinearOpMode {
@@ -71,6 +70,7 @@ public class AEONTeleOp extends LinearOpMode {
         elevatorMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         elevatorMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -183,7 +183,6 @@ public class AEONTeleOp extends LinearOpMode {
             }
 
             //elevator
-
             if (opA) {
                 reZero(); //sets whatever position it's at to zero
             }
@@ -248,6 +247,8 @@ public class AEONTeleOp extends LinearOpMode {
             telemetry.addData("Drone Servo position", droneServo.getPosition());
             telemetry.addData("trapdoor position", trapdoorServo.getPosition());
             telemetry.addData("trapdoor pressed", trapdoorBoom);
+            telemetry.addData("ticks", hardwareMap.dcMotor.get("leftFront").getCurrentPosition());
+            telemetry.addData("elevator ticks", hardwareMap.dcMotor.get("elevatorMotor").getCurrentPosition());
             telemetry.update();
         }
     }
