@@ -56,7 +56,7 @@ public class AEONTeleOp extends LinearOpMode {
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
         Servo droneServo = hardwareMap.servo.get("droneServo");
         Servo trapdoorServo = hardwareMap.servo.get("trapdoorServo");
-        final double kP = 1.0 / 4.0;
+        final double kP = 1.0 / 3.0;
         final double kD = 0;
         final double kI = 0;
         boolean intakeOn = false;
@@ -229,20 +229,23 @@ public class AEONTeleOp extends LinearOpMode {
                 rightFront.setPower(frontRightPower);
                 rightRear.setPower(backRightPower);
             } else {
-                leftFront.setPower(frontLeftPower / 2);
-                leftRear.setPower(backLeftPower / 2);
-                rightFront.setPower(frontRightPower / 2);
-                rightRear.setPower(backRightPower / 2);
+                leftFront.setPower(frontLeftPower / 4);
+                leftRear.setPower(backLeftPower / 4);
+                rightFront.setPower(frontRightPower / 4);
+                rightRear.setPower(backRightPower / 4);
             }
 
-            telemetry.addData("Drone Servo position", droneServo.getPosition());
+            telemetry.addLine("Elevator:");
             telemetry.addData("Elevator Setpoint", setpoint);
             telemetry.addData("Elevator Raw Position", elevatorMotor.getCurrentPosition());
             telemetry.addData("Elevator Position", getElevatorPosition());
             telemetry.addData("Elevator Target Position", elevatorMotor.getTargetPosition());
             telemetry.addData("Error", error);
             telemetry.addData("Elevator Power", elevatorPower);
-            telemetry.addData("kP", kP);
+            telemetry.addLine("\nfield centric stuff idk:");
+            telemetry.addData("YawPitchRoll Angles:", imu.getRobotYawPitchRollAngles());
+            telemetry.addData("Orientation as Quaternion:", imu.getRobotOrientationAsQuaternion());
+            telemetry.addData("Drone Servo position", droneServo.getPosition());
             telemetry.addData("trapdoor position", trapdoorServo.getPosition());
             telemetry.addData("trapdoor pressed", trapdoorBoom);
             telemetry.update();
