@@ -136,7 +136,7 @@ public class AEONTeleOp extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            //intake command
+            //Rising edge for intake toggle :
             if (rightBumperPressed) {
                 if (intakeOn) {
                     intakeOn = false;
@@ -149,7 +149,7 @@ public class AEONTeleOp extends LinearOpMode {
             } else {
                 intakeMotor.setPower(0);
             }
-
+            //Pixel spit
             if (opRB) {
                 intakeMotor.setPower(-1);
             }
